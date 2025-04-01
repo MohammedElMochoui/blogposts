@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: blog_post_manager
+  datasource:
+    url: jdbc:mysql://localhost:3306/blogposts
+    username: root
+    password: password
+  jpa:
+    hibernate:
+      ddl-auto: update
