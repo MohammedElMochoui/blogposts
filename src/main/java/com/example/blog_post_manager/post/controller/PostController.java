@@ -1,13 +1,12 @@
 package com.example.blog_post_manager.post.controller;
 
-import com.example.blog_post_manager.post.dto.CreatePostDTO;
-import com.example.blog_post_manager.post.dto.PostDTO;
-import com.example.blog_post_manager.post.dto.PostSummaryDTO;
-import com.example.blog_post_manager.post.dto.UpdatePostDTO;
+import com.example.blog_post_manager.post.dto.*;
 import com.example.blog_post_manager.post.service.PostService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -20,28 +19,33 @@ public class PostController {
     }
 
     @GetMapping
-    public List<PostSummaryDTO> getAll() {
-        return postService.getAllPostSummary();
+    public ResponseEntity<List<PostSummaryDTO>> getAll() {
+        List<PostSummaryDTO> posts = postService.getAllPostSummary();
+        return ResponseEntity.ok(posts);
     }
 
     @GetMapping("/{id}")
-    public PostDTO getAll(@PathVariable Long id) {
-        return postService.getPost(id);
+    public ResponseEntity<PostDTO> getPostById(@PathVariable Long id) {
+        PostDTO post = postService.getPost(id);
+        return ResponseEntity.ok(post);
     }
 
     @PostMapping
-    public PostDTO createPost(@RequestBody CreatePostDTO createPostDTO) {
-        return postService.createPost(createPostDTO.title(), createPostDTO.content());
+    public ResponseEntity<CreatePostResponseDTO> createPost(@Valid @RequestBody CreatePostDTO createPostDTO) {
+        CreatePostResponseDTO createdPost = postService.createPost(createPostDTO.title(), createPostDTO.content());
+        URI location = URI.create("/posts/" + createdPost.id());
+        return ResponseEntity.created(location).body(createdPost);
     }
 
     @PutMapping("/{id}")
-    public PostDTO updatePost(@RequestBody UpdatePostDTO updatePostDTO, @PathVariable Long id) {
-        return postService.updatePost(id, updatePostDTO.title(), updatePostDTO.content());
+    public ResponseEntity<PostDTO> updatePost(@Valid @RequestBody UpdatePostDTO updatePostDTO, @PathVariable Long id) {
+        PostDTO updatedPost = postService.updatePost(id, updatePostDTO.title(), updatePostDTO.content());
+        return ResponseEntity.ok(updatedPost);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deletePost(@RequestBody UpdatePostDTO updatePostDTO, @PathVariable Long id) {
+    public ResponseEntity<String> deletePost(@PathVariable Long id) {
         postService.deletePost(id);
-        return ResponseEntity.ok("Post with id " + id + " deleted sucessfully");
+        return ResponseEntity.noContent().build();
     }
 }
