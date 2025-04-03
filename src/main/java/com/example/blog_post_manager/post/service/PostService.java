@@ -52,7 +52,8 @@ public class PostService {
 
     @Transactional
     public void deletePost(Long id) {
-        if (!postRepository.existsById(id)) throw new ResourceNotFoundException("Cannot find post with id: " + id);
+        if (!postRepository.existsById(id))
+            throw new ResourceNotFoundException("Cannot find post with id: " + id);
         postRepository.deleteById(id);
     }
 }

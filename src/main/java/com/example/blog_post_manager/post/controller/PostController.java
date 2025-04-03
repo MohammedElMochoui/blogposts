@@ -20,26 +20,26 @@ public class PostController {
 
     @GetMapping
     public ResponseEntity<List<PostSummaryDTO>> getAll() {
-        List<PostSummaryDTO> posts = postService.getAllPostSummary();
+        final List<PostSummaryDTO> posts = postService.getAllPostSummary();
         return ResponseEntity.ok(posts);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<PostDTO> getPostById(@PathVariable Long id) {
-        PostDTO post = postService.getPost(id);
+        final PostDTO post = postService.getPost(id);
         return ResponseEntity.ok(post);
     }
 
     @PostMapping
     public ResponseEntity<CreatePostResponseDTO> createPost(@Valid @RequestBody CreatePostDTO createPostDTO) {
-        CreatePostResponseDTO createdPost = postService.createPost(createPostDTO.title(), createPostDTO.content());
-        URI location = URI.create("/posts/" + createdPost.id());
+        final CreatePostResponseDTO createdPost = postService.createPost(createPostDTO.title(), createPostDTO.content());
+        final URI location = URI.create("/posts/" + createdPost.id());
         return ResponseEntity.created(location).body(createdPost);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<PostDTO> updatePost(@Valid @RequestBody UpdatePostDTO updatePostDTO, @PathVariable Long id) {
-        PostDTO updatedPost = postService.updatePost(id, updatePostDTO.title(), updatePostDTO.content());
+        final PostDTO updatedPost = postService.updatePost(id, updatePostDTO.title(), updatePostDTO.content());
         return ResponseEntity.ok(updatedPost);
     }
 
