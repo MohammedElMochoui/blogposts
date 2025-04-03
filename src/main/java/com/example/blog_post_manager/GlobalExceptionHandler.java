@@ -2,6 +2,7 @@ package com.example.blog_post_manager;
 
 import com.example.blog_post_manager.dto.error.ErrorDetails;
 import com.example.blog_post_manager.post.exception.ResourceNotFoundException;
+import com.example.blog_post_manager.user.exception.UserWithUsernameAlreadyExistsException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -31,5 +32,11 @@ public class GlobalExceptionHandler {
             errors.put(fieldName, errorMessage);
         });
         return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(UserWithUsernameAlreadyExistsException.class)
+    public ResponseEntity<ErrorDetails> handleUserWithUsernameAlreadyExistsException(UserWithUsernameAlreadyExistsException ex, WebRequest request) {
+        ErrorDetails errorDetails = new ErrorDetails(HttpStatus.UNPROCESSABLE_ENTITY.value(), ex.getMessage(), request.getDescription(false));
+        return new ResponseEntity<>(errorDetails, HttpStatus.UNPROCESSABLE_ENTITY);
     }
 }
