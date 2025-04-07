@@ -4,6 +4,7 @@ import com.example.blog_post_manager.user.dto.CreateUserDTO;
 import com.example.blog_post_manager.user.dto.CreateUserResponseDTO;
 import com.example.blog_post_manager.user.dto.UserResponseDTO;
 import com.example.blog_post_manager.user.service.UserManagementService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -39,7 +40,7 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<CreateUserResponseDTO> createUser(@RequestBody CreateUserDTO createUserDTO) {
+    public ResponseEntity<CreateUserResponseDTO> createUser(@Valid @RequestBody CreateUserDTO createUserDTO) {
         CreateUserResponseDTO createUserResponseDTO = userManagementService.createUser(createUserDTO.username(), createUserDTO.password());
         URI uri = URI.create("/users/" + createUserResponseDTO.id());
         return ResponseEntity.created(uri).body(createUserResponseDTO);
