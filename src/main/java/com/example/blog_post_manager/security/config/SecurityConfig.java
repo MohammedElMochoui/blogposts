@@ -1,5 +1,6 @@
 package com.example.blog_post_manager.security.config;
 
+import com.example.blog_post_manager.user.model.UserRole;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -27,7 +28,10 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(config ->
                         config.requestMatchers(HttpMethod.GET, "/posts/**").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/users").hasRole(UserRole.ADMIN.name())
                                 .requestMatchers(HttpMethod.POST, "/users").permitAll()
+                                .requestMatchers(HttpMethod.PATCH, "/users").hasRole(UserRole.ADMIN.name())
+                                .requestMatchers(HttpMethod.DELETE, "/users{username}/role/{role}").hasRole(UserRole.ADMIN.name())
                                 .anyRequest().authenticated())
                 .httpBasic(Customizer.withDefaults())
                 .sessionManagement(config -> config.sessionCreationPolicy(SessionCreationPolicy.STATELESS));

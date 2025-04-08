@@ -1,10 +1,11 @@
 package com.example.blog_post_manager.user.controller;
 
-import com.example.blog_post_manager.user.dto.CreateUserDTO;
-import com.example.blog_post_manager.user.dto.CreateUserResponseDTO;
-import com.example.blog_post_manager.user.dto.UserResponseDTO;
+import com.example.blog_post_manager.dto.error.ErrorDetails;
+import com.example.blog_post_manager.user.dto.*;
+import com.example.blog_post_manager.user.model.UserRole;
 import com.example.blog_post_manager.user.service.UserManagementService;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -44,6 +45,25 @@ public class UserController {
         CreateUserResponseDTO createUserResponseDTO = userManagementService.createUser(createUserDTO.username(), createUserDTO.password());
         URI uri = URI.create("/users/" + createUserResponseDTO.id());
         return ResponseEntity.created(uri).body(createUserResponseDTO);
+    }
+
+    @PatchMapping
+    public ResponseEntity<AddRoleToUserResponseDTO> addRoleToUser(@Valid @RequestBody AddRoleToUserDTO addRoleToUserDTO) {
+        AddRoleToUserResponseDTO addRoleToUserResponseDTO = userManagementService.addRoleToUser(addRoleToUserDTO.username(), addRoleToUserDTO.role());
+        return ResponseEntity.ok(addRoleToUserResponseDTO);
+    }
+
+    @DeleteMapping("/{username}/role/{role}")
+    public ResponseEntity<String> deleteRoleFromUser(String username, String role) {
+        try {
+            UserRole r = UserRole.valueOf(role.toUpperCase());
+            userManagementService.removeRoleFromUser(username, r);
+        } catch (Exception e) {
+            String message = "The role provided is not a valid role!";
+            throw new IllegalArgumentException(message);
+        }
+
+        return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/{id}")
