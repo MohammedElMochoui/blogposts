@@ -1,11 +1,9 @@
 package com.example.blog_post_manager.user.controller;
 
-import com.example.blog_post_manager.dto.error.ErrorDetails;
 import com.example.blog_post_manager.user.dto.*;
 import com.example.blog_post_manager.user.model.UserRole;
 import com.example.blog_post_manager.user.service.UserManagementService;
 import jakarta.validation.Valid;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
