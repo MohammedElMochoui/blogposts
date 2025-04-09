@@ -6,6 +6,8 @@ import com.example.blog_post_manager.post.dto.PostSummaryDTO;
 import com.example.blog_post_manager.post.exception.ResourceNotFoundException;
 import com.example.blog_post_manager.post.model.Post;
 import com.example.blog_post_manager.post.repository.PostRepository;
+import com.example.blog_post_manager.user.model.User;
+import com.example.blog_post_manager.user.repository.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -27,6 +29,9 @@ public class PostServiceTests {
 
     @Mock
     private PostRepository postRepository;
+
+    @Mock
+    private UserRepository userRepository;
 
     @InjectMocks
     private PostService postService;
@@ -84,19 +89,22 @@ public class PostServiceTests {
 
     @Test
     void createPost() {
-        String title = "title1";
-        String content = "content1";
-        LocalDateTime now = LocalDateTime.now();
+        final String title = "title1";
+        final String content = "content1";
+        final LocalDateTime now = LocalDateTime.now();
+        final String username = "username";
+        final User u = new User(username, "");
 
-        Post pWithId = mock();
+        final Post pWithId = mock();
         when(pWithId.getId()).thenReturn(1L);
         when(pWithId.getTitle()).thenReturn(title);
         when(pWithId.getContent()).thenReturn(content);
         when(pWithId.getCreatedAt()).thenReturn(now);
 
         when(postRepository.save(any(Post.class))).thenReturn(pWithId);
+        when(userRepository.findByUsername("username")).thenReturn(Optional.of(u));
 
-        CreatePostResponseDTO createPostResponseDTO = postService.createPost(title, content);
+        final CreatePostResponseDTO createPostResponseDTO = postService.createPost(title, content, username);
 
         ArgumentCaptor<Post> postCaptor = ArgumentCaptor.forClass(Post.class);
         verify(postRepository).save(postCaptor.capture());

@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -31,8 +32,8 @@ public class PostController {
     }
 
     @PostMapping
-    public ResponseEntity<CreatePostResponseDTO> createPost(@Valid @RequestBody CreatePostDTO createPostDTO) {
-        final CreatePostResponseDTO createdPost = postService.createPost(createPostDTO.title(), createPostDTO.content());
+    public ResponseEntity<CreatePostResponseDTO> createPost(@Valid @RequestBody CreatePostDTO createPostDTO, Principal principal) {
+        final CreatePostResponseDTO createdPost = postService.createPost(createPostDTO.title(), createPostDTO.content(), principal.getName());
         final URI location = URI.create("/posts/" + createdPost.id());
         return ResponseEntity.created(location).body(createdPost);
     }

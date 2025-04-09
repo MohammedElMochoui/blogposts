@@ -142,7 +142,7 @@ public class PostControllerTests {
         final CreatePostDTO createPostDTO = new CreatePostDTO(title, content);
 
         final CreatePostResponseDTO createPostResponseDTO = new CreatePostResponseDTO(id, title, content, date);
-        when(postService.createPost(title, content)).thenReturn(createPostResponseDTO);
+        when(postService.createPost(title, content, TEST_USER)).thenReturn(createPostResponseDTO);
 
         MvcResult mvcResult = mockMvc.perform(post("/posts")
                         .accept(MediaType.APPLICATION_JSON)
@@ -155,7 +155,7 @@ public class PostControllerTests {
         String json = mvcResult.getResponse().getContentAsString();
         CreatePostResponseDTO responseDto = objectMapper.readValue(json, CreatePostResponseDTO.class);
 
-        verify(postService).createPost(title, content);
+        verify(postService).createPost(title, content, TEST_USER);
         assertThat(responseDto.id()).isEqualTo(id);
         assertThat(responseDto.title()).isEqualTo(title);
         assertThat(responseDto.content()).isEqualTo(content);
@@ -183,7 +183,7 @@ public class PostControllerTests {
         };
         Map<String, String> errors = objectMapper.readValue(json, typeReference);
 
-        verify(postService, never()).createPost(title, content); // Verify that code didn't reach this far!
+        verify(postService, never()).createPost(title, content, TEST_USER); // Verify that code didn't reach this far!
         assertThat(errors.size()).isEqualTo(2);
         assertThat(errors.get("title")).isNotBlank();
         assertThat(errors.get("content")).isNotBlank();

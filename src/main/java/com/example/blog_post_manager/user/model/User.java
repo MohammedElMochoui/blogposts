@@ -1,5 +1,6 @@
 package com.example.blog_post_manager.user.model;
 
+import com.example.blog_post_manager.post.model.Post;
 import jakarta.persistence.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -14,6 +15,12 @@ import java.util.stream.Collectors;
 @Entity
 @Table(name = "users")
 public class User implements UserDetails {
+    @OneToMany(
+            mappedBy = "author",
+            fetch = FetchType.LAZY,
+            cascade = {CascadeType.PERSIST, CascadeType.MERGE}
+    )
+    private final Set<Post> posts = new HashSet<>();
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -21,7 +28,6 @@ public class User implements UserDetails {
     private String username;
     @Column(nullable = false)
     private String password;
-
     @ManyToMany(
             fetch = FetchType.EAGER,
             cascade = {CascadeType.PERSIST, CascadeType.MERGE}
@@ -99,6 +105,15 @@ public class User implements UserDetails {
 
     public void setRoles(Set<Role> roles) {
         this.roles = roles;
+    }
+
+    public void addPost(Post p) {
+        this.posts.add(p);
+        p.setAuthor(this);
+    }
+
+    public Set<Post> getPosts() {
+        return this.posts;
     }
 
     @Override

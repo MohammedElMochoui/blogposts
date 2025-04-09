@@ -1,5 +1,6 @@
 package com.example.blog_post_manager.post.model;
 
+import com.example.blog_post_manager.user.model.User;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -17,6 +18,10 @@ public class Post {
 
     @Lob
     private String content;
+
+    @ManyToOne
+    @JoinColumn(name = "author_id", nullable = false)
+    private User author;
 
     @CreationTimestamp
     private LocalDateTime createdAt;
@@ -62,6 +67,15 @@ public class Post {
 
     public LocalDateTime getUpdatedAt() {
         return updatedAt;
+    }
+
+    public User getAuthor() {
+        return this.author;
+    }
+
+    public void setAuthor(User u) {
+        this.author = u;
+        u.getPosts().add(this);
     }
 
     @Override

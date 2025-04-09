@@ -7,6 +7,8 @@ import com.example.blog_post_manager.post.exception.ResourceNotFoundException;
 import com.example.blog_post_manager.post.mapper.PostMapper;
 import com.example.blog_post_manager.post.model.Post;
 import com.example.blog_post_manager.post.repository.PostRepository;
+import com.example.blog_post_manager.user.model.User;
+import com.example.blog_post_manager.user.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,9 +18,11 @@ import java.util.List;
 @Transactional(readOnly = true)
 public class PostService {
     private final PostRepository postRepository;
+    private final UserRepository userRepository;
 
-    public PostService(PostRepository postRepository) {
+    public PostService(PostRepository postRepository, UserRepository userRepository) {
         this.postRepository = postRepository;
+        this.userRepository = userRepository;
     }
 
     public List<PostSummaryDTO> getAllPostSummary() {
@@ -33,8 +37,12 @@ public class PostService {
     }
 
     @Transactional
-    public CreatePostResponseDTO createPost(String title, String content) {
+    public CreatePostResponseDTO createPost(String title, String content, String username) {
         Post p = new Post(title, content);
+        User u = userRepository.findByUsername(username)
+                        .orElseThrow(() -> new ResourceNotFoundException("Cannot find user with username " + username));
+
+        p.setAuthor(u);
         Post updated = postRepository.save(p);
         return PostMapper.toCreatePostResponseDTO(updated);
     }
