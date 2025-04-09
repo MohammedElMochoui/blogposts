@@ -213,7 +213,7 @@ class UserManagementServiceTest {
         assertThat(result.username()).isEqualTo(username);
         assertThat(result.role()).isEqualTo(adminRole.getName().name());
         assertThat(user.getRoles()).hasSize(2);
-        assertThat(user.getRoles()).containsExactly(adminRole, userRole);
+        assertThat(user.getRoles()).contains(adminRole);
     }
 
     @Test

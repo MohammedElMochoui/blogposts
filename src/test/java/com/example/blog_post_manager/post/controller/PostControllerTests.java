@@ -4,13 +4,16 @@ import com.example.blog_post_manager.dto.error.ErrorDetails;
 import com.example.blog_post_manager.post.dto.*;
 import com.example.blog_post_manager.post.exception.ResourceNotFoundException;
 import com.example.blog_post_manager.post.service.PostService;
+import com.example.blog_post_manager.security.config.SecurityConfig;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -19,6 +22,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
+import static com.example.blog_post_manager.SecurityConstants.TEST_USER;
+import static com.example.blog_post_manager.SecurityConstants.USER_ROLE;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -26,6 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(PostController.class)
+@Import(SecurityConfig.class)
 public class PostControllerTests {
 
     @Autowired
@@ -42,6 +48,7 @@ public class PostControllerTests {
     }
 
     @Test
+    @WithMockUser(username = TEST_USER, roles = {USER_ROLE})
     void getAllPosts() throws Exception {
         final String title1 = "title1";
         final String title2 = "title2";
@@ -76,6 +83,7 @@ public class PostControllerTests {
     }
 
     @Test
+    @WithMockUser(username = TEST_USER, roles = {USER_ROLE})
     void getPostById() throws Exception {
         final String title = "title1";
         final String content = "content1";
@@ -102,6 +110,7 @@ public class PostControllerTests {
     }
 
     @Test
+    @WithMockUser(username = TEST_USER, roles = {USER_ROLE})
     void getPostByIdThatDoesntExist() throws Exception {
         final Long id = 1L;
         final String errorMessage = "Cannot find post with id: " + id;
@@ -123,6 +132,7 @@ public class PostControllerTests {
     }
 
     @Test
+    @WithMockUser(username = TEST_USER, roles = {USER_ROLE})
     void createPost() throws Exception {
         final Long id = 1L;
         final String title = "title";
@@ -153,6 +163,7 @@ public class PostControllerTests {
     }
 
     @Test
+    @WithMockUser(username = TEST_USER, roles = {USER_ROLE})
     void createPostWithInvalidInput() throws Exception {
         final Long id = 1L;
         final String title = ""; // cannot be empty
@@ -179,6 +190,7 @@ public class PostControllerTests {
     }
 
     @Test
+    @WithMockUser(username = TEST_USER, roles = {USER_ROLE})
     void updatePost() throws Exception {
         final Long id = 1L;
         final String newTitle = "new title";
@@ -206,6 +218,7 @@ public class PostControllerTests {
     }
 
     @Test
+    @WithMockUser(username = TEST_USER, roles = {USER_ROLE})
     void updatePostWhenInputIsInvalid() throws Exception {
         final Long id = 1L;
         final String newTitle = ""; // cannot be empty
@@ -231,6 +244,7 @@ public class PostControllerTests {
     }
 
     @Test
+    @WithMockUser(username = TEST_USER, roles = {USER_ROLE})
     void deletePost() throws Exception {
         final Long id = 1L;
         doNothing().when(postService).deletePost(id);
@@ -245,6 +259,7 @@ public class PostControllerTests {
 
 
     @Test
+    @WithMockUser(username = TEST_USER, roles = {USER_ROLE})
     void deletePostThatDoesntExist() throws Exception {
         final Long id = 1L;
         final String url = "/posts/" + id;

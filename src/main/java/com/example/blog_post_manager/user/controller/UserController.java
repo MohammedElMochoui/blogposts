@@ -20,7 +20,7 @@ public class UserController {
         this.userManagementService = userManagementService;
     }
 
-    @GetMapping("/{username}")
+    @GetMapping("/username/{username}")
     public ResponseEntity<UserResponseDTO> getUserByUsername(@PathVariable String username) {
         UserResponseDTO userResponseDTO = userManagementService.getUser(username);
         return ResponseEntity.ok(userResponseDTO);
@@ -70,7 +70,7 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
-    @DeleteMapping("/{username}")
+    @DeleteMapping("/username/{username}")
     public ResponseEntity<String> deleteUser(@PathVariable String username) {
         userManagementService.deleteUser(username);
         return ResponseEntity.noContent().build();
