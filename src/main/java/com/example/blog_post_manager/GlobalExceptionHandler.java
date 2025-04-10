@@ -5,6 +5,7 @@ import com.example.blog_post_manager.post.exception.ResourceNotFoundException;
 import com.example.blog_post_manager.user.exception.UserWithUsernameAlreadyExistsException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -38,5 +39,11 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorDetails> handleUserWithUsernameAlreadyExistsException(UserWithUsernameAlreadyExistsException ex, WebRequest request) {
         ErrorDetails errorDetails = new ErrorDetails(HttpStatus.UNPROCESSABLE_ENTITY.value(), ex.getMessage(), request.getDescription(false));
         return new ResponseEntity<>(errorDetails, HttpStatus.UNPROCESSABLE_ENTITY);
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ErrorDetails> handleAccessDeniedException(AccessDeniedException ex, WebRequest request) {
+        ErrorDetails errorDetails = new ErrorDetails(HttpStatus.FORBIDDEN.value(), ex.getMessage(), request.getDescription(false));
+        return new ResponseEntity<>(errorDetails, HttpStatus.FORBIDDEN);
     }
 }

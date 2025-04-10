@@ -6,6 +6,7 @@ public record CreatePostResponseDTO(
         Long id,
         String title,
         String content,
+        String author,
         LocalDateTime createdAt
 ) {
 }

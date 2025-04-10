@@ -36,9 +36,10 @@ public class Post {
         this.title = title;
     }
 
-    public Post(String title, String content) {
+    public Post(String title, String content, User author) {
         this.title = title;
         this.content = content;
+        this.author = author;
     }
 
     public String getContent() {

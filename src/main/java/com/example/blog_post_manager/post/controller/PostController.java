@@ -2,8 +2,10 @@ package com.example.blog_post_manager.post.controller;
 
 import com.example.blog_post_manager.post.dto.*;
 import com.example.blog_post_manager.post.service.PostService;
+import com.example.blog_post_manager.user.model.UserRole;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
@@ -20,14 +22,22 @@ public class PostController {
     }
 
     @GetMapping
-    public ResponseEntity<List<PostSummaryDTO>> getAll() {
-        final List<PostSummaryDTO> posts = postService.getAllPostSummary();
+    public ResponseEntity<List<PostSummaryDTO>> getAll(Authentication auth) {
+        List<PostSummaryDTO> posts;
+        if (auth.getAuthorities().stream()
+                .anyMatch(grantedAuthority ->
+                        grantedAuthority.getAuthority().equals("ROLE_" + UserRole.ADMIN.name())
+                )) {
+            posts = postService.getAllPostSummaryAdmin();
+        } else {
+            posts = postService.getAllPostSummary(auth.getName());
+        }
         return ResponseEntity.ok(posts);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<PostDTO> getPostById(@PathVariable Long id) {
-        final PostDTO post = postService.getPost(id);
+    public ResponseEntity<PostDTO> getPostById(@PathVariable Long id, Principal p) {
+        final PostDTO post = postService.getPost(id, p.getName());
         return ResponseEntity.ok(post);
     }
 
@@ -39,14 +49,14 @@ public class PostController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<PostDTO> updatePost(@Valid @RequestBody UpdatePostDTO updatePostDTO, @PathVariable Long id) {
-        final PostDTO updatedPost = postService.updatePost(id, updatePostDTO.title(), updatePostDTO.content());
+    public ResponseEntity<PostDTO> updatePost(@Valid @RequestBody UpdatePostDTO updatePostDTO, @PathVariable Long id, Principal p) {
+        final PostDTO updatedPost = postService.updatePost(id, updatePostDTO.title(), updatePostDTO.content(), p.getName());
         return ResponseEntity.ok(updatedPost);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deletePost(@PathVariable Long id) {
-        postService.deletePost(id);
+    public ResponseEntity<String> deletePost(@PathVariable Long id, Principal p) {
+        postService.deletePost(id, p.getName());
         return ResponseEntity.noContent().build();
     }
 }

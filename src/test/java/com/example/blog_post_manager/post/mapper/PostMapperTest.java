@@ -4,11 +4,13 @@ import com.example.blog_post_manager.post.dto.CreatePostResponseDTO;
 import com.example.blog_post_manager.post.dto.PostDTO;
 import com.example.blog_post_manager.post.dto.PostSummaryDTO;
 import com.example.blog_post_manager.post.model.Post;
+import com.example.blog_post_manager.user.model.User;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDateTime;
 
+import static com.example.blog_post_manager.SecurityConstants.TEST_USER;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 public class PostMapperTest {
@@ -16,7 +18,8 @@ public class PostMapperTest {
 
     @Test
     void postToPostSummaryDTO() {
-        final Post pWithoutIdAndDate = new Post("title", "content");
+        final User u = new User(TEST_USER, "password");
+        final Post pWithoutIdAndDate = new Post("title", "content", u);
         PostSummaryDTO result = PostMapper.toPostSummaryDto(pWithoutIdAndDate);
         assertThat(result.title()).isEqualTo("title");
         assertThat(result.createdAt()).isNull(); // Jpa doesn't set this field in the mapper
@@ -25,7 +28,8 @@ public class PostMapperTest {
     @Test
     void postToPostSummaryDTOWithIdAndDate() {
         final LocalDateTime date = LocalDateTime.of(2022, 1, 1, 1, 1);
-        final Post p = new Post("title", "content");
+        final User u = new User(TEST_USER, "password");
+        final Post p = new Post("title", "content", u);
         ReflectionTestUtils.setField(p, "createdAt", date);
 
         PostSummaryDTO result = PostMapper.toPostSummaryDto(p);
@@ -41,7 +45,8 @@ public class PostMapperTest {
 
     @Test
     void postToPostDTO() {
-        final Post pWithoutIdAndDate = new Post("title", "content");
+        final User u = new User(TEST_USER, "password");
+        final Post pWithoutIdAndDate = new Post("title", "content", u);
 
         PostDTO result = PostMapper.toPostDto(pWithoutIdAndDate);
         assertThat(result.title()).isEqualTo("title");
@@ -52,7 +57,8 @@ public class PostMapperTest {
     @Test
     void postToPostDTOWithIdAndDate() {
         final LocalDateTime date = LocalDateTime.of(2022, 1, 1, 1, 1);
-        final Post p = new Post("title", "content");
+        final User u = new User(TEST_USER, "password");
+        final Post p = new Post("title", "content", u);
         ReflectionTestUtils.setField(p, "createdAt", date);
         ReflectionTestUtils.setField(p, "updatedAt", date);
 
@@ -70,7 +76,8 @@ public class PostMapperTest {
 
     @Test
     void postToCreatePostResponseDTO() {
-        final Post pWithoutIdAndDate = new Post("title", "content");
+        final User u = new User(TEST_USER, "password");
+        final Post pWithoutIdAndDate = new Post("title", "content", u);
         CreatePostResponseDTO result = PostMapper.toCreatePostResponseDTO(pWithoutIdAndDate);
 
         assertThat(result.id()).isNull(); // Jpa doesn't set this field in the mapper
@@ -83,7 +90,8 @@ public class PostMapperTest {
     void postToCreatePostResponseDTOWithIdAndCreatedAt() {
         final LocalDateTime date = LocalDateTime.of(2022, 1, 1, 1, 1);
         final Long id = 1L;
-        final Post p = new Post("title", "content");
+        final User u = new User(TEST_USER, "password");
+        final Post p = new Post("title", "content", u);
         ReflectionTestUtils.setField(p, "id", id);
         ReflectionTestUtils.setField(p, "createdAt", date);
         ReflectionTestUtils.setField(p, "updatedAt", date);

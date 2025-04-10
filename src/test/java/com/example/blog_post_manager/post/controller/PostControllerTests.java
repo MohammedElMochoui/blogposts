@@ -57,10 +57,10 @@ public class PostControllerTests {
         final LocalDateTime t2 = LocalDateTime.of(2025, 1, 1, 1, 1);
         final LocalDateTime t3 = LocalDateTime.of(2025, 1, 1, 1, 1);
 
-        when(postService.getAllPostSummary()).thenReturn(List.of(
-                new PostSummaryDTO(title1, t),
-                new PostSummaryDTO(title2, t2),
-                new PostSummaryDTO(title3, t3)
+        when(postService.getAllPostSummary(TEST_USER)).thenReturn(List.of(
+                new PostSummaryDTO(title1, TEST_USER, t),
+                new PostSummaryDTO(title2, TEST_USER, t2),
+                new PostSummaryDTO(title3, TEST_USER, t3)
         ));
 
         final MvcResult result = mockMvc.perform(get("/posts")
@@ -73,7 +73,7 @@ public class PostControllerTests {
         };
         final List<PostSummaryDTO> posts = objectMapper.readValue(json, postSummaryListType);
 
-        verify(postService).getAllPostSummary();
+        verify(postService).getAllPostSummary(TEST_USER);
 
         assertThat(posts).isNotNull();
         assertThat(posts.size()).isEqualTo(3);
@@ -88,10 +88,10 @@ public class PostControllerTests {
         final String title = "title1";
         final String content = "content1";
         final LocalDateTime t = LocalDateTime.of(2025, 1, 1, 1, 1);
-        final PostDTO postDTO = new PostDTO(title, content, t);
+        final PostDTO postDTO = new PostDTO(title, content, TEST_USER, t);
 
         final Long id = 1L;
-        when(postService.getPost(id)).thenReturn(postDTO);
+        when(postService.getPost(id, TEST_USER)).thenReturn(postDTO);
 
         MvcResult result = mockMvc.perform(get("/posts/1")
                         .accept(MediaType.APPLICATION_JSON))
@@ -101,7 +101,7 @@ public class PostControllerTests {
         String json = result.getResponse().getContentAsString();
         PostDTO resultPost = objectMapper.readValue(json, PostDTO.class);
 
-        verify(postService).getPost(id);
+        verify(postService).getPost(id, TEST_USER);
 
         assertThat(resultPost).isNotNull();
         assertThat(resultPost.title()).isEqualTo(title);
@@ -115,7 +115,7 @@ public class PostControllerTests {
         final Long id = 1L;
         final String errorMessage = "Cannot find post with id: " + id;
         final String url = "/posts/1";
-        when(postService.getPost(id)).thenThrow(new ResourceNotFoundException(errorMessage));
+        when(postService.getPost(id, TEST_USER)).thenThrow(new ResourceNotFoundException(errorMessage));
 
         MvcResult result = mockMvc.perform(get(url)
                         .accept(MediaType.APPLICATION_JSON))
@@ -125,7 +125,7 @@ public class PostControllerTests {
         String json = result.getResponse().getContentAsString();
         ErrorDetails error = objectMapper.readValue(json, ErrorDetails.class);
 
-        verify(postService).getPost(id);
+        verify(postService).getPost(id, TEST_USER);
         assertThat(error.statuscode()).isEqualTo(404);
         assertThat(error.message()).isEqualTo(errorMessage);
         assertThat(error.details()).isEqualTo("uri=" + url);
@@ -141,7 +141,7 @@ public class PostControllerTests {
 
         final CreatePostDTO createPostDTO = new CreatePostDTO(title, content);
 
-        final CreatePostResponseDTO createPostResponseDTO = new CreatePostResponseDTO(id, title, content, date);
+        final CreatePostResponseDTO createPostResponseDTO = new CreatePostResponseDTO(id, title, content, TEST_USER, date);
         when(postService.createPost(title, content, TEST_USER)).thenReturn(createPostResponseDTO);
 
         MvcResult mvcResult = mockMvc.perform(post("/posts")
@@ -198,8 +198,8 @@ public class PostControllerTests {
         final LocalDateTime date = LocalDateTime.of(2025, 1, 1, 1, 1);
         final UpdatePostDTO updatePostDTO = new UpdatePostDTO(newTitle, newContent);
 
-        final PostDTO postDTO = new PostDTO(newTitle, newContent, date);
-        when(postService.updatePost(id, newTitle, newContent)).thenReturn(postDTO);
+        final PostDTO postDTO = new PostDTO(newTitle, newContent, TEST_USER, date);
+        when(postService.updatePost(id, newTitle, newContent, TEST_USER)).thenReturn(postDTO);
 
         MvcResult mvcResult = mockMvc.perform(put("/posts/" + id)
                         .accept(MediaType.APPLICATION_JSON)
@@ -211,7 +211,7 @@ public class PostControllerTests {
         String json = mvcResult.getResponse().getContentAsString();
         PostDTO result = objectMapper.readValue(json, PostDTO.class);
 
-        verify(postService).updatePost(id, newTitle, newContent);
+        verify(postService).updatePost(id, newTitle, newContent, TEST_USER);
         assertThat(result.title()).isEqualTo(newTitle);
         assertThat(result.content()).isEqualTo(newContent);
         assertThat(result.createdAt()).isEqualTo(date);
@@ -237,7 +237,7 @@ public class PostControllerTests {
         };
         Map<String, String> errors = objectMapper.readValue(json, typeReference);
 
-        verify(postService, never()).updatePost(id, newTitle, newContent);
+        verify(postService, never()).updatePost(id, newTitle, newContent, TEST_USER);
         assertThat(errors.size()).isEqualTo(2);
         assertThat(errors.get("title")).isNotBlank();
         assertThat(errors.get("content")).isNotBlank();
@@ -247,14 +247,14 @@ public class PostControllerTests {
     @WithMockUser(username = TEST_USER, roles = {USER_ROLE})
     void deletePost() throws Exception {
         final Long id = 1L;
-        doNothing().when(postService).deletePost(id);
+        doNothing().when(postService).deletePost(id, TEST_USER);
 
         MvcResult mvcResult = mockMvc.perform(delete("/posts/" + id)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent())
                 .andReturn();
 
-        verify(postService).deletePost(id);
+        verify(postService).deletePost(id, TEST_USER);
     }
 
 
@@ -264,7 +264,7 @@ public class PostControllerTests {
         final Long id = 1L;
         final String url = "/posts/" + id;
         final String errorMessage = "Cannot find post with id: " + id;
-        doThrow(new ResourceNotFoundException(errorMessage)).when(postService).deletePost(id);
+        doThrow(new ResourceNotFoundException(errorMessage)).when(postService).deletePost(id, TEST_USER);
 
         MvcResult mvcResult = mockMvc.perform(delete(url)
                         .accept(MediaType.APPLICATION_JSON))
@@ -274,7 +274,7 @@ public class PostControllerTests {
         String json = mvcResult.getResponse().getContentAsString();
         ErrorDetails errors = objectMapper.readValue(json, ErrorDetails.class);
 
-        verify(postService).deletePost(id);
+        verify(postService).deletePost(id, TEST_USER);
         assertThat(errors.statuscode()).isEqualTo(404);
         assertThat(errors.message()).isEqualTo(errorMessage);
         assertThat(errors.details()).isEqualTo("uri=" + url);

@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 
 public record PostSummaryDTO(
         String title,
+        String author,
         LocalDateTime createdAt
 ) {
 }
