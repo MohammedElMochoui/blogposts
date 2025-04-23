@@ -1,7 +1,6 @@
 services:
   app:
-    build: .
-    image: blog_post_manager:dev-latest
+    image: mootjhe/blog_post_manager:dev-latest
     ports:
       - "8080:8080"
     environment:
