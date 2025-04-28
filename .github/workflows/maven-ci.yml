@@ -27,4 +27,13 @@ jobs:
         with: 
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_SECRET }}
+      
+      - name: Build docker image 
+        run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/blog_post_manager:${{ github.sha }}
+
+      - name: Push docker image to registery with commit tag
+        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/blog_post_manager:${{ github.sha }}
+
+      - name: Push docker image to registery with latest tag
+        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/blog_post_manager:latest
 
