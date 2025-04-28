@@ -13,3 +13,5 @@ public record CreatePostDTO(
         String content
 ) {
 }
+
+// Just a small change to test CI/CD
