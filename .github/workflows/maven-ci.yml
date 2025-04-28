@@ -21,3 +21,10 @@ jobs:
       
       - name: Build with maven 
         run: mvn clean install 
+      
+      - name: Login to dockerhub
+        uses: docker/login@v4
+        with: 
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_SECRET }}
+
